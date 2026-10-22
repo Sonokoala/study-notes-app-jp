@@ -1,0 +1,4 @@
+python-pptx>=1.0
+requests>=2.31
+faster-whisper>=1.1
+comtypes>=1.4
