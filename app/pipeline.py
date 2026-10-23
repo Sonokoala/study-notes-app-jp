@@ -1,6 +1,6 @@
 """録画またはスクリーンショット -> 4分割の学習ノート（日本語）＋ 読み上げ原稿つきのプレゼン（英語）。"""
 import datetime, os, re
-from . import config, llm, prompts
+from . import coach, config, llm, prompts
 from .builders import quad, deck
 from .export import to_pdf
 from .transcribe import transcribe
@@ -37,6 +37,13 @@ def process(kind, paths, subject="", cfg=None, log=print):
     sub = safe_name(subject) if subject else "_未分類"
     out_dir = os.path.join(cfg["output_dir"], sub)
     deck_dir = os.path.join(cfg["deck_dir"], sub) if cfg.get("deck_dir") else out_dir
+    link = cfg.get("coach", {})
+    use_coach = link.get("enabled") and cfg["outputs"].get("deck", True)
+    if use_coach:
+        reason = coach.check(link.get("dir", ""))
+        if reason:
+            raise ValueError(reason + "（「設定」タブの発音練習アプリとの連携を確認してください）")
+        deck_dir = os.path.join(coach.decks_dir(link["dir"]), sub)
     os.makedirs(out_dir, exist_ok=True)
     os.makedirs(deck_dir, exist_ok=True)
 
@@ -90,4 +97,8 @@ def process(kind, paths, subject="", cfg=None, log=print):
             if pdf:
                 saved.append(pdf)
     log("完了: " + out_dir)
+    if use_coach:
+        log("英語のプレゼンは発音練習アプリに入れました: " + deck_dir)
+        if link.get("open_after", True):
+            coach.open_coach(link["dir"], log)
     return saved

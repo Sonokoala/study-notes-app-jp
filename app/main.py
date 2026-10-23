@@ -2,7 +2,7 @@
 import os, queue, subprocess, threading, traceback
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
-from . import config, llm
+from . import coach, config, llm
 from .pipeline import process, AUDIO_VIDEO, IMAGES
 from .watcher import Watcher
 
@@ -15,7 +15,7 @@ class App(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title(APP)
-        self.geometry("920x660")
+        self.geometry("920x740")
         self.configure(bg=BG)
         self.cfg = config.load()
         self.logq = queue.Queue()
@@ -70,8 +70,17 @@ class App(tk.Tk):
         ttk.Button(row2, text="スクリーンショットを選ぶ", style="Accent.TButton",
                    command=self.pick_screens).pack(side="left", padx=8)
         ttk.Button(row2, text="保存先のフォルダを開く", command=lambda: self._open(self.cfg["output_dir"])).pack(side="right")
+        ttk.Button(row2, text="発音練習を開く", command=self.open_coach).pack(side="right", padx=8)
         self.logbox = tk.Text(f, bg=PANEL, fg=FG, insertbackground=FG, relief="flat", wrap="word", font=(FONT, 9))
         self.logbox.pack(fill="both", expand=True, padx=12, pady=(0, 12))
+
+    def open_coach(self):
+        link = self.cfg["coach"]
+        if not link.get("enabled"):
+            messagebox.showinfo(APP, "発音練習まで使う場合は、「設定」タブの「発音練習との連携」をオンにして、"
+                                     "発音練習アプリのフォルダを指定してください。")
+            return
+        coach.open_coach(link["dir"], self.log)
 
     def _subjects(self):
         return sorted({w.get("subject", "") for w in self.cfg.get("watch", []) if w.get("subject")})
@@ -216,6 +225,20 @@ class App(tk.Tk):
                      ("pdf", "PDF も作る（PowerPoint が必要）")):
             self.outs[k] = tk.BooleanVar(value=self.cfg["outputs"].get(k, k != "pdf"))
             ttk.Checkbutton(of, text=t, variable=self.outs[k]).pack(anchor="w")
+        link = self.cfg["coach"]
+        ttk.Label(g, text="発音練習との連携\n（使う人だけ）").grid(row=8, column=0, sticky="nw", pady=4)
+        cf = ttk.Frame(g); cf.grid(row=8, column=1, sticky="w")
+        self.coach_on = tk.BooleanVar(value=link.get("enabled", False))
+        self.coach_dir = tk.StringVar(value=link.get("dir", ""))
+        self.coach_open = tk.BooleanVar(value=link.get("open_after", True))
+        ttk.Checkbutton(cf, text="英語のプレゼンを発音練習アプリ（Pronunciation Coach）に入れる",
+                        variable=self.coach_on).pack(anchor="w")
+        r = ttk.Frame(cf); r.pack(anchor="w", pady=2)
+        ttk.Label(r, text="発音練習アプリのフォルダ").pack(side="left")
+        ttk.Entry(r, textvariable=self.coach_dir, width=44).pack(side="left", padx=4)
+        ttk.Button(r, text="参照", command=lambda: self.coach_dir.set(
+            filedialog.askdirectory(title="発音練習アプリのフォルダ（server.py があるフォルダ）") or self.coach_dir.get())).pack(side="left")
+        ttk.Checkbutton(cf, text="プレゼンを作り終えたら、発音練習アプリを開く", variable=self.coach_open).pack(anchor="w")
         ttk.Button(f, text="保存", style="Accent.TButton", command=self.save_settings).pack(anchor="e", padx=12)
         self.key_help = ttk.Label(f, style="Muted.TLabel", wraplength=820)
         self.key_help.pack(anchor="w", padx=12, pady=8)
@@ -246,6 +269,12 @@ class App(tk.Tk):
         self.cfg["deck_dir"] = self.deck_dir.get().strip()
         self.cfg["whisper_size"] = self.wsize.get()
         self.cfg["outputs"] = {k: v.get() for k, v in self.outs.items()}
+        coach_dir = os.path.normpath(self.coach_dir.get().strip()) if self.coach_dir.get().strip() else ""
+        if self.coach_on.get() and coach.check(coach_dir):
+            messagebox.showerror(APP, coach.check(coach_dir) + "\n\nhttps://github.com/Sonokoala/pronunciation-coach "
+                                 "をダウンロードして、そのフォルダを指定してください。")
+            return
+        self.cfg["coach"] = {"enabled": self.coach_on.get(), "dir": coach_dir, "open_after": self.coach_open.get()}
         self.cfg["setup_done"] = True
         config.save(self.cfg)
         messagebox.showinfo(APP, "保存しました。")
