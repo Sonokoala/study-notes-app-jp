@@ -14,7 +14,7 @@ DEFAULTS = {
     "whisper_size": "small",
     "outputs": {"notes": True, "deck": True, "pdf": False},
     # 発音練習アプリとの連携（オンにすると英語のプレゼンを発音練習アプリの decks に保存する）
-    "coach": {"enabled": False, "dir": "", "open_after": True},
+    "coach": {"enabled": False, "dir": "", "open_after": True, "use_weak": True},
     # 監視するフォルダ: [{"path": "...", "subject": "...", "kind": "recording" | "screenshots"}]
     "watch": [],
     "watch_on_start": True,

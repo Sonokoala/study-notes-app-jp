@@ -77,11 +77,17 @@ def process(kind, paths, subject="", cfg=None, log=print):
 
     jobs = [("notes", " - 学習ノート.pptx", "学習ノート", prompts.quad, out_dir),
             ("deck", " - プレゼン_EN.pptx", "英語のプレゼン", prompts.deck, deck_dir)]
+    weak = None
+    if link.get("enabled") and link.get("use_weak", True) and cfg["outputs"].get("notes", True):
+        weak = coach.weak_points(link.get("dir", ""))
+        if weak["sounds"] or weak["words"]:
+            log("発音練習の苦手な音と単語をノートに反映します: " + (", ".join(f"/{s[0]}/" for s in weak["sounds"]) or "単語のみ"))
     for key, suffix, label, make_prompt, folder in jobs:
         if not cfg["outputs"].get(key, True):
             continue
         log(f"{label}を作成中")
-        spec = llm.ask(ai, make_prompt(src), images)
+        prompt = make_prompt(src, weak) if key == "notes" else make_prompt(src)
+        spec = llm.ask(ai, prompt, images)
         out = os.path.join(folder, base + suffix)
         if key == "notes":
             spec = _check_quad(spec)

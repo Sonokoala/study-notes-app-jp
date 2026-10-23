@@ -15,7 +15,7 @@ class App(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title(APP)
-        self.geometry("920x740")
+        self.geometry("920x770")
         self.configure(bg=BG)
         self.cfg = config.load()
         self.logq = queue.Queue()
@@ -231,6 +231,7 @@ class App(tk.Tk):
         self.coach_on = tk.BooleanVar(value=link.get("enabled", False))
         self.coach_dir = tk.StringVar(value=link.get("dir", ""))
         self.coach_open = tk.BooleanVar(value=link.get("open_after", True))
+        self.coach_weak = tk.BooleanVar(value=link.get("use_weak", True))
         ttk.Checkbutton(cf, text="英語のプレゼンを発音練習アプリ（Pronunciation Coach）に入れる",
                         variable=self.coach_on).pack(anchor="w")
         r = ttk.Frame(cf); r.pack(anchor="w", pady=2)
@@ -239,6 +240,8 @@ class App(tk.Tk):
         ttk.Button(r, text="参照", command=lambda: self.coach_dir.set(
             filedialog.askdirectory(title="発音練習アプリのフォルダ（server.py があるフォルダ）") or self.coach_dir.get())).pack(side="left")
         ttk.Checkbutton(cf, text="プレゼンを作り終えたら、発音練習アプリを開く", variable=self.coach_open).pack(anchor="w")
+        ttk.Checkbutton(cf, text="発音練習で苦手だった音と単語を、ノートの左下（用語と発音）に反映する",
+                        variable=self.coach_weak).pack(anchor="w")
         ttk.Button(f, text="保存", style="Accent.TButton", command=self.save_settings).pack(anchor="e", padx=12)
         self.key_help = ttk.Label(f, style="Muted.TLabel", wraplength=820)
         self.key_help.pack(anchor="w", padx=12, pady=8)
@@ -274,7 +277,8 @@ class App(tk.Tk):
             messagebox.showerror(APP, coach.check(coach_dir) + "\n\nhttps://github.com/Sonokoala/pronunciation-coach "
                                  "をダウンロードして、そのフォルダを指定してください。")
             return
-        self.cfg["coach"] = {"enabled": self.coach_on.get(), "dir": coach_dir, "open_after": self.coach_open.get()}
+        self.cfg["coach"] = {"enabled": self.coach_on.get(), "dir": coach_dir, "open_after": self.coach_open.get(),
+                             "use_weak": self.coach_weak.get()}
         self.cfg["setup_done"] = True
         config.save(self.cfg)
         messagebox.showinfo(APP, "保存しました。")

@@ -30,8 +30,22 @@ def topic(src):
 {"topic": "日本語で20文字以内"}"""
 
 
-def quad(src):
-    return src + LANG_JA + """
+def weak_block(weak):
+    """発音練習アプリで見つかった苦手な音と単語を、左下の用語選びとコツに反映させる指示（なければ空）。"""
+    if not weak or not (weak.get("sounds") or weak.get("words")):
+        return ""
+    lines = ["この人が最近の発音練習（Azure の採点）で苦手だったもの:"]
+    for ipa, alt, avg, n in weak.get("sounds", []):
+        lines.append(f"- 音 /{ipa}/" + (f"（/{alt}/ に聞こえやすい）" if alt else "") + f": 平均 {avg} 点、{n} 回")
+    if weak.get("words"):
+        lines.append("- 点が低かった単語: " + ", ".join(weak["words"]))
+    lines.append("左下（terms）では、教材の専門用語のうち、これらの音を含むものを優先して選び、"
+                 "tip ではその音の具体的な直し方（舌・唇の位置など）を書く。教材に関係のない単語は入れない。")
+    return "\n".join(lines) + "\n"
+
+
+def quad(src, weak=None):
+    return src + LANG_JA + weak_block(weak) + """
 この教材から4分割の学習ノートを作る。1ページ1トピック、3〜8ページ、ページ間で内容を重複させない。
 読む人は、別の分野から来て、短い期間に処理しきれないほどの知識を詰め込まれている新人や学習者。
 パッと見て理解できるように、1ページに載せる情報を絞り、専門外の人にも分かる言葉で書く。
