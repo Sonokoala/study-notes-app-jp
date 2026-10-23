@@ -214,7 +214,7 @@ class App(tk.Tk):
         self.outs = {}
         for k, t in (("notes", "4分割の学習ノート（日本語）"), ("deck", "読み上げ原稿つきのプレゼン（英語）"),
                      ("pdf", "PDF も作る（PowerPoint が必要）")):
-            self.outs[k] = tk.BooleanVar(value=self.cfg["outputs"].get(k, True))
+            self.outs[k] = tk.BooleanVar(value=self.cfg["outputs"].get(k, k != "pdf"))
             ttk.Checkbutton(of, text=t, variable=self.outs[k]).pack(anchor="w")
         ttk.Button(f, text="保存", style="Accent.TButton", command=self.save_settings).pack(anchor="e", padx=12)
         self.key_help = ttk.Label(f, style="Muted.TLabel", wraplength=820)

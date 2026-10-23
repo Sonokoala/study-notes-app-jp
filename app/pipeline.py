@@ -85,7 +85,7 @@ def process(kind, paths, subject="", cfg=None, log=print):
             spec["lang"] = "en"
             deck.build(spec, out)
         saved.append(out)
-        if cfg["outputs"].get("pdf", True):
+        if cfg["outputs"].get("pdf", False):
             pdf = to_pdf(out, log)
             if pdf:
                 saved.append(pdf)

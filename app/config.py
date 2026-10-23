@@ -12,7 +12,7 @@ DEFAULTS = {
     "output_dir": os.path.join(os.path.expanduser("~"), "Documents", "StudyNotesJP"),
     "deck_dir": "",           # 空ならノートと同じフォルダ
     "whisper_size": "small",
-    "outputs": {"notes": True, "deck": True, "pdf": True},
+    "outputs": {"notes": True, "deck": True, "pdf": False},
     # 監視するフォルダ: [{"path": "...", "subject": "...", "kind": "recording" | "screenshots"}]
     "watch": [],
     "watch_on_start": True,
