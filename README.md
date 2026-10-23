@@ -25,7 +25,7 @@
 ## 使い方
 
 1. 「**設定**」タブで、使う AI を選び、API キーと保存先のフォルダを入力して「保存」を押します。
-   - Gemini: https://aistudio.google.com/apikey で無料の API キーを取得できます（無料枠では、送った内容が Google の製品改善に使われることがあります）。モデルは無料枠で使える `gemini-3.8-flash`（既定）、`gemini-3.6-flash`、`gemini-3.5-flash-lite`、`gemini-3.1-flash-lite` から選べます。
+   - Gemini: https://aistudio.google.com/apikey で無料の API キーを取得できます（無料枠では、送った内容が Google の製品改善に使われることがあります）。モデルは無料枠で使える `gemini-3.5-flash-lite`（既定。速くて軽い）、`gemini-3.8-flash`、`gemini-3.6-flash`、`gemini-3.1-flash-lite` から選べます。長い講義でノートが途中で切れるときは `gemini-3.8-flash` を試してください。
    - Claude、ChatGPT: 使った分だけ課金されます。
    - Ollama: https://ollama.com をインストールし、画像を読めるモデルを追加します（例: `ollama pull gemma3:12b`）。無料で、データはこの PC の外に出ません。
 2. 「**作成**」タブで、録画（mp4、m4a、wav など）、文字起こし（.txt）、またはスクリーンショット（複数可）を選びます。
