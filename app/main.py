@@ -232,7 +232,7 @@ class App(tk.Tk):
         p = self.provider.get()
         self.model.set(self.cfg["models"].get(p) or llm.PROVIDERS[p][1])
         self.key.set(self.cfg["api_keys"].get(p, ""))
-        self.model_box.configure(values=llm.ollama_models(self.host.get()) if p == "ollama" else [llm.PROVIDERS[p][1]])
+        self.model_box.configure(values=llm.ollama_models(self.host.get()) if p == "ollama" else llm.MODEL_CHOICES.get(p, [llm.PROVIDERS[p][1]]))
         self.key_help.configure(text=self.HELP[p])
 
     def save_settings(self):

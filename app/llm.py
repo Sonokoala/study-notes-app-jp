@@ -4,10 +4,14 @@ import requests
 
 PROVIDERS = {
     # 名前: (表示名, 既定のモデル, API キーが必要か)
-    "gemini": ("Gemini (Google)", "gemini-2.5-flash", True),
+    "gemini": ("Gemini (Google)", "gemini-3.8-flash", True),
     "claude": ("Claude (Anthropic)", "claude-sonnet-5-5", True),
     "openai": ("ChatGPT (OpenAI)", "gpt-4.1-mini", True),
     "ollama": ("Ollama（この PC で動かす）", "gemma3:12b", False),
+}
+# 選べるモデル（Gemini は無料枠で使えるもの）
+MODEL_CHOICES = {
+    "gemini": ["gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite"],
 }
 TIMEOUT = 600
 
